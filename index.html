@@ -34,7 +34,7 @@
     <h1>早稲田祭2025販管アプリ(早稲田キャリア研究会)</h1>
 
     <!-- 商品行テンプレート -->
-    <div class="row product-row" data-item="チョコレート" data-price="400">
+    <div class="row product-row" data-item="チョコレート" data-price="400" label = "1">
       <div class="left">
         <label><input type="checkbox" class="product-check"> <span class="prod-label">チョコレート</span></label>
         <div class="price">¥<span class="price-val">400</span> / 個</div>
@@ -46,7 +46,7 @@
       </div>
     </div>
 
-    <div class="row product-row" data-item="のり醤油" data-price="400">
+    <div class="row product-row" data-item="のり醤油" data-price="400" label = "1">
       <div class="left">
         <label><input type="checkbox" class="product-check"> <span class="prod-label">のり醤油</span></label>
         <div class="price">¥<span class="price-val">400</span> / 個</div>
@@ -58,7 +58,7 @@
       </div>
     </div>
 
-    <div class="row product-row" data-item="キャラメル" data-price="400">
+    <div class="row product-row" data-item="キャラメル" data-price="400" label = "1">
       <div class="left">
         <label><input type="checkbox" class="product-check"> <span class="prod-label">キャラメル</span></label>
         <div class="price">¥<span class="price-val">400</span> / 個</div>
@@ -70,7 +70,7 @@
       </div>
     </div>
 
-    <div class="row product-row" data-item="水" data-price="150">
+    <div class="row product-row" data-item="水" data-price="150" label = "-1">
       <div class="left">
         <label><input type="checkbox" class="product-check"> <span class="prod-label">水</span></label>
         <div class="price">¥<span class="price-val">150</span> / 個</div>
@@ -155,15 +155,19 @@ function setRowEnabled(row, enabled) {
 /* 合計計算 */
 function computeTotals() {
   let subtotal = 0;
+  let discount = 0;
   productRows.forEach(row => {
     const check = row.querySelector(".product-check");
     if (!check.checked) return;
     const price = Number(row.dataset.price) || 0;
+    const label = row.dataset.label || 0;
     const qty = Number(row.querySelector(".qty-input").value) || 0;
     subtotal += price * qty;
+    discount += label * qty;
   });
   const discountOn = discountCheck.checked;
-  const discountAmount = discountOn ? (subtotal - DISCOUNT_RATE) : 0;
+  const discountAbs = discount > 0 ? discount : -discount;
+  const discountAmount = discountOn ? (subtotal - DISCOUNT_RATE * discountAbs) : 0;
   const total = subtotal - discountAmount;
 
   subtotalEl.textContent = subtotal.toLocaleString();
