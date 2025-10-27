@@ -70,7 +70,7 @@
       </div>
     </div>
 
-    <div class="row product-row" data-item="水" data-price="150" label = "-1">
+    <div class="row product-row" data-item="水" data-price="150" label = "2">
       <div class="left">
         <label><input type="checkbox" class="product-check"> <span class="prod-label">水</span></label>
         <div class="price">¥<span class="price-val">150</span> / 個</div>
@@ -155,7 +155,6 @@ function setRowEnabled(row, enabled) {
 /* 合計計算 */
 function computeTotals() {
   let subtotal = 0;
-  let discount = 0;
   let moffle = 0;
   let water = 0;
   productRows.forEach(row => {
@@ -165,12 +164,11 @@ function computeTotals() {
     const label = row.dataset.label || 0;
     const qty = Number(row.querySelector(".qty-input").value) || 0;
     subtotal += price * qty;
-    discount += label * qty;
     if(label == 1) moffle += qty;
-    if(label == -1) water += qty;
+    if(label == 2) water += qty;
   });
   const discountOn = discountCheck.checked;
-  const discountAbs = discount > 0 ? water : moffle;
+  const discountAbs = moffle - water > 0 ? water : moffle;
   const discountAmount = discountOn ? (subtotal - DISCOUNT_RATE * discountAbs) : 0;
   const total = subtotal - discountAmount;
 
