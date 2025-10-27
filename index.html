@@ -204,7 +204,6 @@ sendBtn.addEventListener("click", async () => {
   // payload
   const payload = {
     items,
-    discount: discountCheck.checked,
     clientSubtotal: Number(subtotalEl.textContent.replace(/,/g,'')),
     clientDiscount: Number(discountEl.textContent.replace(/,/g,'')),
     clientTotal: Number(totalEl.textContent.replace(/,/g,''))
@@ -235,7 +234,6 @@ try {
     document.querySelectorAll(".product-check").forEach(ch => ch.checked = false);
     document.querySelectorAll(".qty-input").forEach(qi => qi.value = MIN_QTY);
     document.querySelectorAll(".qty-controls button, .qty-input").forEach(el => el.disabled = true);
-    discountCheck.checked = false;
     computeTotals();
 
   } catch (err) {
