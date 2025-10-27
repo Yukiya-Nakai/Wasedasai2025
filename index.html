@@ -170,7 +170,7 @@ function computeTotals() {
   });
   //const discountOn = discountCheck.checked;
   const discountAbs = moffle - water > 0 ? water : moffle;
-  const discountAmount = subtotal - DISCOUNT_RATE * discountAbs;
+  const discountAmount = DISCOUNT_RATE * discountAbs;
   const total = subtotal - discountAmount;
 
   subtotalEl.textContent = subtotal.toLocaleString();
