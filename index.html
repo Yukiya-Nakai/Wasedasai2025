@@ -163,7 +163,7 @@ function computeTotals() {
     subtotal += price * qty;
   });
   const discountOn = discountCheck.checked;
-  const discountAmount = discountOn ? Math.round(subtotal - DISCOUNT_RATE) : 0;
+  const discountAmount = discountOn ? (subtotal - DISCOUNT_RATE) : 0;
   const total = subtotal - discountAmount;
 
   subtotalEl.textContent = subtotal.toLocaleString();
