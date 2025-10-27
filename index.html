@@ -164,9 +164,8 @@ function computeTotals() {
     if (!check.checked) return;
     const price = Number(row.dataset.price) || 0;
     const qty = Number(row.querySelector(".qty-input").value) || 0;
-    const label = row.querySelector(".prod-label");
     subtotal += price * qty;
-    label == 水 ? water += qty : moffle += qty;
+    price == 150 ? water += qty : moffle += qty;
   });
   //const discountOn = discountCheck.checked;
   const discountAbs = moffle - water > 0 ? water : moffle;
