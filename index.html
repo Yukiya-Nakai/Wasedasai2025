@@ -34,10 +34,10 @@
     <h1>早稲田祭2025販管アプリ(早稲田キャリア研究会)</h1>
 
     <!-- 商品行テンプレート -->
-    <div class="row product-row" data-item="チョコレート" data-price="300">
+    <div class="row product-row" data-item="チョコレート" data-price="400">
       <div class="left">
         <label><input type="checkbox" class="product-check"> <span class="prod-label">チョコレート</span></label>
-        <div class="price">¥<span class="price-val">300</span> / 個</div>
+        <div class="price">¥<span class="price-val">400</span> / 個</div>
       </div>
       <div class="qty-controls">
         <button class="qty-btn minus" aria-label="減らす">−</button>
@@ -46,10 +46,10 @@
       </div>
     </div>
 
-    <div class="row product-row" data-item="醤油" data-price="300">
+    <div class="row product-row" data-item="のり醤油" data-price="400">
       <div class="left">
-        <label><input type="checkbox" class="product-check"> <span class="prod-label">醤油</span></label>
-        <div class="price">¥<span class="price-val">300</span> / 個</div>
+        <label><input type="checkbox" class="product-check"> <span class="prod-label">のり醤油</span></label>
+        <div class="price">¥<span class="price-val">400</span> / 個</div>
       </div>
       <div class="qty-controls">
         <button class="qty-btn minus" aria-label="減らす">−</button>
@@ -58,10 +58,22 @@
       </div>
     </div>
 
-    <div class="row product-row" data-item="キャラメル" data-price="300">
+    <div class="row product-row" data-item="キャラメル" data-price="400">
       <div class="left">
         <label><input type="checkbox" class="product-check"> <span class="prod-label">キャラメル</span></label>
-        <div class="price">¥<span class="price-val">300</span> / 個</div>
+        <div class="price">¥<span class="price-val">400</span> / 個</div>
+      </div>
+      <div class="qty-controls">
+        <button class="qty-btn minus" aria-label="減らす">−</button>
+        <input class="qty-input" type="text" inputmode="numeric" value="1" readonly>
+        <button class="qty-btn plus" aria-label="増やす">＋</button>
+      </div>
+    </div>
+
+    <div class="row product-row" data-item="水" data-price="150">
+      <div class="left">
+        <label><input type="checkbox" class="product-check"> <span class="prod-label">水</span></label>
+        <div class="price">¥<span class="price-val">150</span> / 個</div>
       </div>
       <div class="qty-controls">
         <button class="qty-btn minus" aria-label="減らす">−</button>
@@ -71,7 +83,7 @@
     </div>
 
     <div class="controls">
-      <label class="discount"><input id="discount" type="checkbox"> 割引あり（¥100）</label>
+      <label class="discount"><input id="discount" type="checkbox"> 割引あり（¥50）</label>
       <div style="flex:1"></div>
       <div id="status" style="font-size:0.95rem;color:#555"></div>
     </div>
@@ -90,7 +102,7 @@
 const GAS_URL = "https://script.google.com/macros/s/AKfycbzkw3OPiEXtgx6a1CSBxcQyof0yD-x_z28gHbOMyw2qoEMrT7OMuk3j6rsf3f4sFqQ1/exec"; // ← ここを差し替えてください
 const MIN_QTY = 1;
 const MAX_QTY = 99;
-const DISCOUNT_RATE = 1/3;
+const DISCOUNT_RATE = 50;
 
 /* 要素取得 */
 const productRows = Array.from(document.querySelectorAll(".product-row"));
@@ -151,7 +163,7 @@ function computeTotals() {
     subtotal += price * qty;
   });
   const discountOn = discountCheck.checked;
-  const discountAmount = discountOn ? Math.round(subtotal * DISCOUNT_RATE) : 0;
+  const discountAmount = discountOn ? Math.round(subtotal - DISCOUNT_RATE) : 0;
   const total = subtotal - discountAmount;
 
   subtotalEl.textContent = subtotal.toLocaleString();
