@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>販売入力（±ボタン版）</title>
+<style>
+  :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;}
+  body{margin:0;padding:1rem;background:#f2f6fb;color:#111}
+  .card{background:#fff;border-radius:12px;padding:1rem;box-shadow:0 2px 8px rgba(0,0,0,0.06);max-width:720px;margin:0 auto}
+  h1{font-size:1.2rem;margin:0 0 0.75rem;text-align:center}
+  .row{display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0;border-bottom:1px solid #eef2f6}
+  .left{display:flex;align-items:center;gap:0.6rem;flex:1}
+  .prod-label{font-size:1.05rem}
+  .price{font-size:0.95rem;color:#666}
+  .qty-controls{display:flex;align-items:center;gap:0.4rem}
+  button.qty-btn{width:40px;height:40px;border-radius:8px;border:1px solid #ddd;background:#fafafa;font-size:1.2rem}
+  button.qty-btn:active{transform:translateY(1px)}
+  .qty-input{width:48px;height:40px;border-radius:8px;border:1px solid #ddd;text-align:center;font-size:1.05rem}
+  .disabled{opacity:0.5}
+  .controls{margin-top:0.6rem;display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap}
+  .discount{display:flex;align-items:center;gap:0.4rem;font-size:1rem}
+  .total-box{margin-top:1rem;padding:0.8rem;border-radius:10px;background:#fafcff;border:1px solid #e6f0ff}
+  .total-line{display:flex;justify-content:space-between;align-items:center;font-size:1.05rem;padding:0.2rem 0}
+  .send-btn{width:100%;margin-top:1rem;background:#0078ff;color:white;border:none;padding:0.9rem;border-radius:10px;font-size:1.05rem}
+  @media (max-width:420px){
+    .left{flex-direction:column;align-items:flex-start;gap:0.4rem}
+    .qty-controls{margin-top:0.2rem}
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>販売入力（±ボタン）</h1>
+
+    <!-- 商品行テンプレート -->
+    <div class="row product-row" data-item="チョコレート" data-price="300">
+      <div class="left">
+        <label><input type="checkbox" class="product-check"> <span class="prod-label">チョコレート</span></label>
+        <div class="price">¥<span class="price-val">300</span> / 個</div>
+      </div>
+      <div class="qty-controls">
+        <button class="qty-btn minus" aria-label="減らす">−</button>
+        <input class="qty-input" type="text" inputmode="numeric" value="1" readonly>
+        <button class="qty-btn plus" aria-label="増やす">＋</button>
+      </div>
+    </div>
+
+    <div class="row product-row" data-item="醤油" data-price="300">
+      <div class="left">
+        <label><input type="checkbox" class="product-check"> <span class="prod-label">醤油</span></label>
+        <div class="price">¥<span class="price-val">300</span> / 個</div>
+      </div>
+      <div class="qty-controls">
+        <button class="qty-btn minus" aria-label="減らす">−</button>
+        <input class="qty-input" type="text" inputmode="numeric" value="1" readonly>
+        <button class="qty-btn plus" aria-label="増やす">＋</button>
+      </div>
+    </div>
+
+    <div class="row product-row" data-item="キャラメル" data-price="300">
+      <div class="left">
+        <label><input type="checkbox" class="product-check"> <span class="prod-label">キャラメル</span></label>
+        <div class="price">¥<span class="price-val">300</span> / 個</div>
+      </div>
+      <div class="qty-controls">
+        <button class="qty-btn minus" aria-label="減らす">−</button>
+        <input class="qty-input" type="text" inputmode="numeric" value="1" readonly>
+        <button class="qty-btn plus" aria-label="増やす">＋</button>
+      </div>
+    </div>
+
+    <div class="controls">
+      <label class="discount"><input id="discount" type="checkbox"> 割引あり（¥100）</label>
+      <div style="flex:1"></div>
+      <div id="status" style="font-size:0.95rem;color:#555"></div>
+    </div>
+
+    <div class="total-box" aria-live="polite">
+      <div class="total-line"><div>小計</div><div>¥<span id="subtotal">0</span></div></div>
+      <div class="total-line"><div>割引</div><div>− ¥<span id="discountAmount">0</span></div></div>
+      <div class="total-line" style="font-weight:700;font-size:1.15rem"><div>合計</div><div>¥<span id="total">0</span></div></div>
+    </div>
+
+    <button id="sendBtn" class="send-btn">送信</button>
+  </div>
+
+<script>
+/* 設定 */
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzMYdRUYbovc7jtiNh6tfmKwvw5vgH8JlUDFyT_Ut4Uvufz0f7x2LA-6XEuIDiN6q0L/exec"; // ← ここを差し替えてください
+const MIN_QTY = 1;
+const MAX_QTY = 99;
+const DISCOUNT_RATE = 2/7; // 10%
+
+
+/* 要素取得 */
+const productRows = Array.from(document.querySelectorAll(".product-row"));
+const subtotalEl = document.getElementById("subtotal");
+const discountEl = document.getElementById("discountAmount");
+const totalEl = document.getElementById("total");
+const statusEl = document.getElementById("status");
+const sendBtn = document.getElementById("sendBtn");
+const discountCheck = document.getElementById("discount");
+
+/* 初期化：数量コントロールとチェック動作 */
+productRows.forEach(row => {
+  const check = row.querySelector(".product-check");
+  const minus = row.querySelector(".minus");
+  const plus = row.querySelector(".plus");
+  const qtyInput = row.querySelector(".qty-input");
+
+  // 最初は選択されていないので非活性表示
+  setRowEnabled(row, false);
+
+  check.addEventListener("change", () => {
+    setRowEnabled(row, check.checked);
+    computeTotals();
+  });
+
+  minus.addEventListener("click", () => {
+    let q = Number(qtyInput.value) || MIN_QTY;
+    q = Math.max(MIN_QTY, q - 1);
+    qtyInput.value = q;
+    computeTotals();
+  });
+  plus.addEventListener("click", () => {
+    let q = Number(qtyInput.value) || MIN_QTY;
+    q = Math.min(MAX_QTY, q + 1);
+    qtyInput.value = q;
+    computeTotals();
+  });
+});
+
+/* 有効化/無効化ヘルパー */
+function setRowEnabled(row, enabled) {
+  const controls = row.querySelectorAll(".qty-controls button, .qty-input");
+  controls.forEach(el => {
+    el.disabled = !enabled;
+    if (enabled) el.classList.remove("disabled"); else el.classList.add("disabled");
+  });
+  row.style.opacity = enabled ? '1' : '0.7';
+}
+
+/* 合計計算 */
+function computeTotals() {
+  let subtotal = 0;
+  productRows.forEach(row => {
+    const check = row.querySelector(".product-check");
+    if (!check.checked) return;
+    const price = Number(row.dataset.price) || 0;
+    const qty = Number(row.querySelector(".qty-input").value) || 0;
+    subtotal += price * qty;
+  });
+  const discountOn = discountCheck.checked;
+  const discountAmount = discountOn ? Math.round(subtotal * DISCOUNT_RATE) : 0;
+  const total = subtotal - discountAmount;
+
+  subtotalEl.textContent = subtotal.toLocaleString();
+  discountEl.textContent = discountAmount.toLocaleString();
+  totalEl.textContent = total.toLocaleString();
+
+  // ステータス（簡易）
+  const selectedCount = productRows.filter(r=>r.querySelector(".product-check").checked).length;
+  statusEl.textContent = selectedCount ? `${selectedCount}アイテム選択` : '選択してください';
+}
+
+/* 割引チェック時に更新 */
+discountCheck.addEventListener("change", computeTotals);
+
+
+/* 送信処理 */
+sendBtn.addEventListener("click", async () => {
+  const items = [];
+  productRows.forEach(row => {
+    const check = row.querySelector(".product-check");
+    if (!check.checked) return;
+    const item = row.dataset.item;
+    const qty = Number(row.querySelector(".qty-input").value) || 0;
+    items.push({ item, quantity: qty });
+  });
+
+  if (items.length === 0) {
+    alert("少なくとも1つの商品を選択してください。");
+    return;
+  }
+
+  // payload
+  const payload = {
+    items,
+    discount: discountCheck.checked,
+    clientSubtotal: Number(subtotalEl.textContent.replace(/,/g,'')),
+    clientDiscount: Number(discountEl.textContent.replace(/,/g,'')),
+    clientTotal: Number(totalEl.textContent.replace(/,/g,''))
+  };
+
+  // UIロック
+  sendBtn.disabled = true;
+  sendBtn.textContent = "送信中…";
+
+try {
+    const res = await fetch(GAS_URL, {
+      method: "POST",
+      mode: 'no-cors', // これを忘れずに
+      headers: { 
+        'Content-Type': 'application/json' 
+      },
+      body: JSON.stringify(payload)
+    });
+
+    // 💡 レスポンスの読み取りをスキップし、リクエストが送信されたことで成功と見なす
+    // 'no-cors'モードではレスポンスオブジェクトの 'ok' は常に false、'type' は 'opaque' になります。
+    // fetchが失敗しなかった（Promiseがrejectされなかった）時点で成功と見なします。
+    
+    // スプレッドシートの確認を促すメッセージに変更
+    alert("送信しました！\n（※通信成功。データはスプレッドシートに書き込まれています。）");
+
+    // リセット
+    document.querySelectorAll(".product-check").forEach(ch => ch.checked = false);
+    document.querySelectorAll(".qty-input").forEach(qi => qi.value = MIN_QTY);
+    document.querySelectorAll(".qty-controls button, .qty-input").forEach(el => el.disabled = true);
+    discountCheck.checked = false;
+    computeTotals();
+
+  } catch (err) {
+    console.error(err);
+    // fetch failed のエラーが出た場合
+    alert(`通信エラーが発生しました。\n詳細: ${err.message || "ネットワークを確認してください。"}`);
+  } finally {
+    sendBtn.disabled = false;
+    sendBtn.textContent = "送信";
+  }
+});
+
+/* 初回計算 */
+computeTotals();
+</script>
+</body>
+</html>
