@@ -83,11 +83,11 @@
     </div>
     
     
-    <!-- <div class="controls">
-      <label class="discount"><input id="discount" type="checkbox" value="true"> 割引あり（¥50）</label>
+    <div class="controls">
+      <label class="discount"><input id="discount" type="text" value="true"> 割引あり（¥50）</label>
       <div style="flex:1"></div>
       <div id="status" style="font-size:0.95rem;color:#555"></div>
-    </div> -->
+    </div>
     
 
     <div class="total-box" aria-live="polite">
@@ -113,6 +113,7 @@ const discountEl = document.getElementById("discountAmount");
 const totalEl = document.getElementById("total");
 const statusEl = document.getElementById("status");
 const sendBtn = document.getElementById("sendBtn");
+const discountCheck = document.getElementById("discount");
 
 /* 初期化：数量コントロールとチェック動作 */
 productRows.forEach(row => {
@@ -166,7 +167,7 @@ function computeTotals() {
     subtotal += price * qty;
     price == 150 ? water += qty : moffle += qty;
   });
-  //const discountOn = discountCheck.checked;
+  const discountOn = discountCheck.checked;
   const discountAbs = moffle - water > 0 ? water : moffle;
   const discountAmount = DISCOUNT_RATE * discountAbs;
   const total = subtotal - discountAmount;
@@ -179,6 +180,9 @@ function computeTotals() {
   const selectedCount = productRows.filter(r=>r.querySelector(".product-check").checked).length;
   statusEl.textContent = selectedCount ? `${selectedCount}アイテム選択` : '選択してください';
 }
+
+/* 割引チェック時に更新 */
+discountCheck.addEventListener("change", computeTotals);
 
 
 /* 送信処理 */
@@ -200,6 +204,7 @@ sendBtn.addEventListener("click", async () => {
   // payload
   const payload = {
     items,
+    discount: discountCheck.checked,
     clientSubtotal: Number(subtotalEl.textContent.replace(/,/g,'')),
     clientDiscount: Number(discountEl.textContent.replace(/,/g,'')),
     clientTotal: Number(totalEl.textContent.replace(/,/g,''))
@@ -230,6 +235,7 @@ try {
     document.querySelectorAll(".product-check").forEach(ch => ch.checked = false);
     document.querySelectorAll(".qty-input").forEach(qi => qi.value = MIN_QTY);
     document.querySelectorAll(".qty-controls button, .qty-input").forEach(el => el.disabled = true);
+    discountCheck.checked = false;
     computeTotals();
 
   } catch (err) {
