@@ -81,12 +81,14 @@
         <button class="qty-btn plus" aria-label="増やす">＋</button>
       </div>
     </div>
-
-    <div class="controls">
+    
+    
+    <!-- <div class="controls">
       <label class="discount"><input id="discount" type="checkbox" value="true"> 割引あり（¥50）</label>
       <div style="flex:1"></div>
       <div id="status" style="font-size:0.95rem;color:#555"></div>
-    </div>
+    </div> -->
+    
 
     <div class="total-box" aria-live="polite">
       <div class="total-line"><div>小計</div><div>¥<span id="subtotal">0</span></div></div>
@@ -166,9 +168,9 @@ function computeTotals() {
     subtotal += price * qty;
     label == "水" ? water += qty : moffle += qty;
   });
-  const discountOn = discountCheck.checked;
+  //const discountOn = discountCheck.checked;
   const discountAbs = moffle - water > 0 ? water : moffle;
-  const discountAmount = discountOn ? (subtotal - DISCOUNT_RATE * discountAbs) : 0;
+  const discountAmount = subtotal - DISCOUNT_RATE * discountAbs;
   const total = subtotal - discountAmount;
 
   subtotalEl.textContent = subtotal.toLocaleString();
