@@ -113,7 +113,6 @@ const discountEl = document.getElementById("discountAmount");
 const totalEl = document.getElementById("total");
 const statusEl = document.getElementById("status");
 const sendBtn = document.getElementById("sendBtn");
-const discountCheck = document.getElementById("discount");
 
 /* 初期化：数量コントロールとチェック動作 */
 productRows.forEach(row => {
@@ -180,9 +179,6 @@ function computeTotals() {
   const selectedCount = productRows.filter(r=>r.querySelector(".product-check").checked).length;
   statusEl.textContent = selectedCount ? `${selectedCount}アイテム選択` : '選択してください';
 }
-
-/* 割引チェック時に更新 */
-discountCheck.addEventListener("change", computeTotals);
 
 
 /* 送信処理 */
