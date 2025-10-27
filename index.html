@@ -161,7 +161,7 @@ function computeTotals() {
     const check = row.querySelector(".product-check");
     if (!check.checked) return;
     const price = Number(row.dataset.price) || 0;
-    const label = row.dataset.label || 0;
+    const label = Number(row.dataset.label) || 0;
     const qty = Number(row.querySelector(".qty-input").value) || 0;
     subtotal += price * qty;
     if(label == 1) moffle += qty;
