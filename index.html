@@ -156,6 +156,8 @@ function setRowEnabled(row, enabled) {
 function computeTotals() {
   let subtotal = 0;
   let discount = 0;
+  let moffle = 0;
+  let water = 0;
   productRows.forEach(row => {
     const check = row.querySelector(".product-check");
     if (!check.checked) return;
@@ -164,9 +166,11 @@ function computeTotals() {
     const qty = Number(row.querySelector(".qty-input").value) || 0;
     subtotal += price * qty;
     discount += label * qty;
+    if(label == 1) moffle += qty;
+    if(label == -1) water += qty;
   });
   const discountOn = discountCheck.checked;
-  const discountAbs = discount > 0 ? discount : -discount;
+  const discountAbs = discount > 0 ? water : moffle;
   const discountAmount = discountOn ? (subtotal - DISCOUNT_RATE * discountAbs) : 0;
   const total = subtotal - discountAmount;
 
